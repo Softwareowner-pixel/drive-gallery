@@ -106,13 +106,13 @@ button{font:inherit}
   <div id="prog"></div>
   <div class="vs" id="vs"></div>
   <div class="grid" id="grid"></div>
-  <input type="file" id="pick" multiple hidden>
+  <input type="file" id="pick" accept="image/*,video/*" multiple hidden><input type="file" id="pick2" multiple hidden>
 </div>
 <div class="screen hide" id="view">
   <div id="vc"></div><div id="vinfo"></div>
   <div id="vbar"><button class="vb" id="vp">‹</button><button class="vb" id="vx">Close</button><button class="vb" id="vd">Save</button><button class="vb d" id="vdel">Delete</button><button class="vb" id="vn">›</button></div>
 </div>
-<div id="menu" class="hide"><div id="mref">Refresh</div><div id="msel">Select files</div></div>
+<div id="menu" class="hide"><div id="mfile">Add other files</div><div id="mref">Refresh</div><div id="msel">Select files</div></div>
 <div id="toast"></div>
 
 <script>
@@ -253,12 +253,14 @@ async function addFile(f,i,n){
   const meta={name:f.name,type:f.type||'application/octet-stream',size:f.size,added:Date.now(),chunks:cnt,thumb:await mkThumb(f)};
   await put(id+'.m',await encBuf(enc(JSON.stringify(meta))));
 }
-$('pick').onchange=async e=>{
+const onPick=async e=>{
   const fs=[...e.target.files];e.target.value='';uploading=true;
   try{for(let i=0;i<fs.length;i++)await addFile(fs[i],i,fs.length);toast('Done')}
   catch(err){toast('Upload failed: '+err.message)}
   uploading=false;$('prog').style.width='0';await refresh(true);
 };
+$('pick').onchange=onPick;$('pick2').onchange=onPick;
+$('mfile').onclick=()=>$('pick2').click();
 /* menu */
 $('menub').onclick=e=>{e.stopPropagation();$('menu').classList.toggle('hide')};
 document.addEventListener('click',()=>hid('menu'));
