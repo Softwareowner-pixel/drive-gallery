@@ -202,7 +202,7 @@ function render(){
   $('lock').textContent=selMode?'Cancel':'Lock';
   $('vs').textContent=list.length?list.length+' items • '+fmt(list.reduce((a,b)=>a+b.size,0))+' • shared':'';
   g.innerHTML='';
-  if(!list.length){g.innerHTML='<div class="emp" style="grid-column:1/-1">Gallery is empty.<br>Tap “+ Add”. Jo bhi add hoga sab phones par dikhega.</div>';return}
+  if(!list.length){g.innerHTML='';return}
   list.forEach((it,i)=>{
     const d=document.createElement('div');d.className='t'+(sel.has(it.id)?' s':'');
     if(it.thumb){d.innerHTML=`<img src="${it.thumb}">`;if(it.type.startsWith('video/'))d.insertAdjacentHTML('beforeend','<span class="pl">▶</span>')}
