@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#131314">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Drive</title>
+<style>
+:root{--bg:#131314;--card:#1e1f20;--card2:#282a2c;--tx:#e3e3e3;--sub:#9aa0a6;--ac:#a8c7fa;--pill:#004a77}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:Roboto,system-ui,sans-serif;overflow:hidden;user-select:none}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.hide{display:none!important}
+.sbar{margin:12px 12px 8px;background:var(--card);border-radius:28px;height:52px;display:flex;align-items:center;padding:0 16px;gap:16px}
+.sbar .ph{flex:1;color:var(--sub);font-size:16px}
+.ham{font-size:24px;padding:6px;cursor:pointer}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a73e8,#7b1fa2)}
+.tabs{display:flex;border-bottom:1px solid #333}
+.tabs div{flex:1;text-align:center;padding:14px;color:var(--sub);font-size:15px}
+.tabs .on{color:var(--ac);border-bottom:3px solid var(--ac)}
+.list{flex:1;overflow:auto;padding-bottom:90px}
+.list h4{margin:16px;font-weight:500;font-size:15px}
+.row{display:flex;align-items:center;padding:12px 16px;gap:16px}
+.ic{width:24px;height:24px;border-radius:4px;flex:none;background:#e06c75}.ic.r{background:#cfcfcf}
+.row b{font-weight:400;font-size:16px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:66vw}
+.row small{color:var(--sub);font-size:12px}.dots{margin-left:auto;color:var(--sub);font-size:20px}
+.emp{text-align:center;color:var(--sub);padding:80px 30px;font-size:15px}
+.fab{position:fixed;right:20px;bottom:calc(88px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:18px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:36px;color:var(--ac)}
+.nav{display:flex;background:var(--card);padding:8px 0 calc(8px + env(safe-area-inset-bottom));font-size:12px;color:var(--sub)}
+.nav div{flex:1;text-align:center}.nav i{display:block;font-style:normal;font-size:20px;margin:0 auto 2px;padding:2px 18px;border-radius:14px;width:fit-content}
+.nav .on{color:var(--tx)}.nav .on i{background:var(--pill)}
+/* drawer */
+#scrim{position:fixed;inset:0;background:#0008;z-index:20;opacity:0;pointer-events:none;transition:.25s}
+#scrim.o{opacity:1;pointer-events:auto}
+#drawer{position:fixed;top:0;bottom:0;left:0;width:84%;max-width:340px;background:var(--bg);z-index:21;transform:translateX(-102%);transition:.25s;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);overflow:auto;border-radius:0 24px 24px 0}
+#drawer.o{transform:none}
+#drawer h1{margin:0;padding:20px 24px 8px;font-size:22px;font-weight:500}
+#drawer .q{margin:8px 16px 12px;background:var(--card);border-radius:26px;display:flex;align-items:center;padding:0 16px;gap:10px;height:48px}
+#drawer input{flex:1;background:none;border:0;outline:0;color:var(--tx);font-size:16px;user-select:text}
+.di{display:flex;gap:18px;align-items:center;padding:13px 24px;font-size:15px;margin-right:12px;border-radius:0 28px 28px 0}
+.di.on{background:var(--pill)}.di span{width:22px;text-align:center}
+.dv{height:1px;background:#333;margin:8px 0}
+.stor{padding:6px 24px 24px;color:var(--sub);font-size:13px}
+.bar{height:4px;background:#333;border-radius:2px;margin:8px 0}.bar div{height:100%;width:78%;background:var(--ac);border-radius:2px}
+/* vault */
+#vault{background:#0f1011;z-index:8}
+.vh{display:flex;align-items:center;gap:8px;padding:12px 14px}
+.vh h2{margin:0;font-size:20px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font:inherit}
+.vb{background:var(--card2);color:var(--tx);border:0;border-radius:20px;padding:10px 14px;font-size:14px}
+.vb.p{background:var(--ac);color:#062e6f}.vb.d{background:#8c1d18;color:#fff}
+.grid{flex:1;overflow:auto;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:3px;align-content:start}
+.t{aspect-ratio:1;background:var(--card);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:11px;text-align:center;word-break:break-all;padding:4px}
+.t img,.t video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.t .pl{position:absolute;right:6px;bottom:4px;font-size:12px;color:#fff;text-shadow:0 0 4px #000}
+.t .ck{position:absolute;left:6px;top:6px;width:22px;height:22px;border-radius:50%;border:2px solid #fff;background:#0006;display:none;align-items:center;justify-content:center;font-size:14px;color:#fff}
+.sel .t .ck{display:flex}.t.s .ck{background:var(--ac);border-color:var(--ac);color:#062e6f}.t.s{outline:3px solid var(--ac);outline-offset:-3px}
+.vs{padding:4px 16px;color:var(--sub);font-size:12px}
+#prog{height:3px;background:var(--ac);width:0;transition:width .2s}
+#view{background:#000;z-index:10}
+#vc{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#vc img,#vc video{max-width:100%;max-height:100%}
+#vinfo{color:#bbb;font-size:12px;text-align:center;padding:6px}
+#vbar{display:flex;gap:8px;padding:8px 10px calc(10px + env(safe-area-inset-bottom));justify-content:center;flex-wrap:wrap}
+#menu{position:fixed;right:12px;top:calc(56px + env(safe-area-inset-top));background:var(--card2);border-radius:12px;z-index:30;min-width:200px;box-shadow:0 4px 20px #000a}
+#menu div{padding:14px 18px;font-size:15px}
+#toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#e3e3e3;color:#111;padding:10px 18px;border-radius:8px;font-size:14px;z-index:99;opacity:0;transition:.25s;pointer-events:none;white-space:nowrap}
+#toast.o{opacity:1}
+</style></head><body>
+
+<!-- HOME (fake Drive) -->
+<div class="screen" id="home">
+  <div class="sbar"><span class="ham" id="ham">☰</span><span class="ph" id="ph">Search in Drive</span><div class="av"></div></div>
+  <div class="tabs"><div class="on" id="tS">Suggested</div><div id="tA">Activity</div></div>
+  <div class="list" id="hl"></div>
+  <div class="fab" id="fab">+</div>
+  <div class="nav" id="nav"><div class="on" data-v="home"><i>⌂</i>Home</div><div data-v="star"><i>☆</i>Starred</div><div data-v="shared"><i>👥</i>Shared</div><div data-v="files"><i>▭</i>Files</div></div>
+</div>
+
+<!-- DRAWER -->
+<div id="scrim"></div>
+<div id="drawer">
+  <h1>Drive</h1>
+  <div class="q"><span>🔍</span><input id="q" type="search" enterkeyhint="search" placeholder="Search in Drive" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+  <div class="di on"><span>⌂</span>Home</div>
+  <div class="di"><span>🕘</span>Recent</div>
+  <div class="di"><span>☆</span>Starred</div>
+  <div class="di"><span>👥</span>Shared with me</div>
+  <div class="di"><span>▭</span>My Drive</div>
+  <div class="di"><span>📥</span>Offline</div>
+  <div class="dv"></div>
+  <div class="di"><span>🗑</span>Trash</div>
+  <div class="di"><span>☁</span>Backups</div>
+  <div class="di"><span>🔔</span>Notifications</div>
+  <div class="di"><span>⚙</span>Settings</div>
+  <div class="di"><span>❓</span>Help &amp; feedback</div>
+  <div class="dv"></div>
+  <div class="stor">Storage<div class="bar"><div></div></div>11.7 GB of 15 GB used</div>
+</div>
+
+<!-- VAULT -->
+<div class="screen hide" id="vault">
+  <div class="vh"><h2 id="vt">Gallery</h2><button class="vb p" id="addb">+ Add</button><button class="vb" id="menub">⋮</button><button class="vb" id="lock">Lock</button></div>
+  <div id="prog"></div>
+  <div class="vs" id="vs"></div>
+  <div class="grid" id="grid"></div>
+  <input type="file" id="pick" multiple hidden>
+</div>
+<div class="screen hide" id="view">
+  <div id="vc"></div><div id="vinfo"></div>
+  <div id="vbar"><button class="vb" id="vp">‹</button><button class="vb" id="vx">Close</button><button class="vb" id="vd">Save</button><button class="vb d" id="vdel">Delete</button><button class="vb" id="vn">›</button></div>
+</div>
+<div id="menu" class="hide"><div id="mref">Refresh</div><div id="msel">Select files</div></div>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id), show=id=>$(id).classList.remove('hide'), hid=id=>$(id).classList.add('hide');
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('o');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('o'),2200)}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+/* ---------- fake Drive home ---------- */
+const FILES=[["8_COPYRIGHT FREE BY AVMST…","You opened • Oct 12, 2024","a"],["Ortex Media Batch no 44,45,4…","You opened • Feb 15, 2025","a"],["Vfx sound 1.mp3","You opened • Oct 23, 2024","a"],["belye-svetodiodnye-fonari-4-…","You opened • Jul 12","r"],["GTAV167BUILD3028.rar","You opened • Jul 23","r"],["2025 GTA5 VR MOD.rar","You opened • Oct 15, 2025","r"]];
+function homeView(v){
+  document.querySelectorAll('#nav div').forEach(d=>d.classList.toggle('on',d.dataset.v===v));
+  $('tS').style.display=$('tA').style.display=v==='home'?'':'none';
+  const L=$('hl');
+  if(v==='home'){L.innerHTML='<h4>Files</h4>'+FILES.map(x=>`<div class="row"><div class="ic ${x[2]==='r'?'r':''}"></div><div><b></b><small>${x[1]}</small></div><span class="dots">⋮</span></div>`).join('');L.querySelectorAll('.row b').forEach((b,i)=>b.textContent=FILES[i][0])}
+  else L.innerHTML='<div class="emp">'+({star:'No starred files',shared:'Nothing shared with you yet',files:'No files here'})[v]+'</div>';
+}
+homeView('home');
+$('nav').onclick=e=>{const d=e.target.closest('[data-v]');if(d)homeView(d.dataset.v)};
+$('fab').onclick=()=>toast('Upload from the Drive app');
+$('hl').onclick=()=>toast('Offline – cannot open file');
+
+/* ---------- config + crypto ---------- */
+let CFG=null,KEY=null;
+const cfgReady=fetch('config.json',{cache:'no-store'}).then(r=>r.json()).then(c=>CFG=c).catch(()=>{});
+const enc=s=>new TextEncoder().encode(s);
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',enc(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function deriveKey(pw){const km=await crypto.subtle.importKey('raw',enc(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:enc('drive-vault-v1'),iterations:150000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function encBuf(buf){const iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},KEY,buf);const o=new Uint8Array(12+ct.byteLength);o.set(iv);o.set(new Uint8Array(ct),12);return o}
+const decBuf=u8=>crypto.subtle.decrypt({name:'AES-GCM',iv:u8.slice(0,12)},KEY,u8.slice(12));
+
+/* ---------- Supabase storage (all data arrives encrypted) ---------- */
+const HD=()=>CFG.key.startsWith('eyJ')?{apikey:CFG.key,Authorization:'Bearer '+CFG.key}:{apikey:CFG.key};
+const BASE=()=>CFG.url.replace(/\/$/,'')+'/storage/v1/object';
+async function put(p,u8){const r=await fetch(`${BASE()}/vault/${p}`,{method:'POST',headers:{...HD(),'x-upsert':'true','Content-Type':'application/octet-stream'},body:u8});if(!r.ok)throw new Error('put '+r.status)}
+async function get(p){const r=await fetch(`${BASE()}/authenticated/vault/${p}`,{headers:HD(),cache:'no-store'});if(!r.ok)throw new Error('get '+r.status);return new Uint8Array(await r.arrayBuffer())}
+async function names(){let all=[],off=0;for(;;){const r=await fetch(`${BASE()}/list/vault`,{method:'POST',headers:{...HD(),'Content-Type':'application/json'},body:JSON.stringify({prefix:'',limit:1000,offset:off,sortBy:{column:'name',order:'asc'}})});if(!r.ok)throw new Error('list '+r.status);const j=await r.json();all=all.concat(j.map(x=>x.name));if(j.length<1000)break;off+=1000}return all}
+async function delPaths(p){const r=await fetch(`${BASE()}/vault`,{method:'DELETE',headers:{...HD(),'Content-Type':'application/json'},body:JSON.stringify({prefixes:p})});if(!r.ok)throw new Error('del '+r.status)}
+
+/* ---------- drawer + secret search ---------- */
+function openDrawer(){$('drawer').classList.add('o');$('scrim').classList.add('o');setTimeout(()=>$('q').focus(),280)}
+function closeDrawer(){$('drawer').classList.remove('o');$('scrim').classList.remove('o');$('q').blur()}
+$('ham').onclick=openDrawer;$('ph').onclick=openDrawer;$('scrim').onclick=closeDrawer;
+document.querySelectorAll('.di').forEach(d=>d.onclick=()=>{closeDrawer();if(d.textContent.trim()!=='Home')toast('Nothing here yet')});
+let unlocked=false,opening=false;
+async function tryUnlock(v){
+  if(!v||v.length<4||opening)return false;
+  await cfgReady;if(!CFG)return false;
+  if(await sha(v)!==CFG.password_hash)return false;
+  opening=true;
+  try{
+    KEY=await deriveKey(v);$('q').value='';closeDrawer();
+    if(!CFG.url||!CFG.key||CFG.url.includes('YOUR')){toast('config.json mein Supabase url/key daalo');opening=false;return true}
+    unlocked=true;show('vault');await refresh(true);startPoll();
+  }catch(e){toast('Error: '+e.message)}
+  opening=false;return true;
+}
+$('q').addEventListener('input',e=>{tryUnlock(e.target.value)});
+$('q').addEventListener('keydown',async e=>{if(e.key==='Enter'&&!(await tryUnlock(e.target.value)))toast('No results found')});
+
+/* ---------- vault ---------- */
+const metas=new Map(),blobs=new Map();
+let list=[],sig='',sel=new Set(),selMode=false,hiddenAt=0,uploading=false,poll=null,vi=0,vurl=null;
+const fmt=n=>n>1e9?(n/1e9).toFixed(1)+' GB':n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+function startPoll(){clearInterval(poll);poll=setInterval(()=>{if(unlocked&&!uploading&&!document.hidden)refresh(false)},8000)}
+function lock(){clearInterval(poll);unlocked=false;KEY=null;metas.clear();blobs.clear();list=[];sig='';sel.clear();selMode=false;hid('vault');hid('view');hid('menu');$('vc').innerHTML='';$('grid').innerHTML=''}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)hiddenAt=Date.now();
+  else if(unlocked&&!uploading){if(Date.now()-hiddenAt>30000)lock();else refresh(false)}
+});
+async function refresh(force){
+  try{
+    const ids=(await names()).filter(n=>n.endsWith('.m')).map(n=>n.slice(0,-2));
+    const set=new Set(ids);
+    for(const k of [...metas.keys()])if(!set.has(k))metas.delete(k);
+    const need=ids.filter(i=>!metas.has(i));
+    for(let i=0;i<need.length;i+=6)await Promise.all(need.slice(i,i+6).map(async id=>{try{const j=JSON.parse(new TextDecoder().decode(await decBuf(await get(id+'.m'))));j.id=id;metas.set(id,j)}catch(e){}}));
+    list=[...metas.values()].sort((a,b)=>b.added-a.added);
+    const s=list.map(x=>x.id).join();
+    sel=new Set([...sel].filter(i=>metas.has(i)));
+    if(force||s!==sig){sig=s;render()}
+  }catch(e){if(force)toast('Sync error: '+e.message)}
+}
+function render(){
+  const g=$('grid');g.classList.toggle('sel',selMode);
+  $('vt').textContent=selMode?sel.size+' selected':'Gallery';
+  $('addb').textContent=selMode?'Delete':'+ Add';$('addb').className='vb '+(selMode?'d':'p');
+  $('lock').textContent=selMode?'Cancel':'Lock';
+  $('vs').textContent=list.length?list.length+' items • '+fmt(list.reduce((a,b)=>a+b.size,0))+' • shared':'';
+  g.innerHTML='';
+  if(!list.length){g.innerHTML='<div class="emp" style="grid-column:1/-1">Gallery is empty.<br>Tap “+ Add”. Jo bhi add hoga sab phones par dikhega.</div>';return}
+  list.forEach((it,i)=>{
+    const d=document.createElement('div');d.className='t'+(sel.has(it.id)?' s':'');
+    if(it.thumb){d.innerHTML=`<img src="${it.thumb}">`;if(it.type.startsWith('video/'))d.insertAdjacentHTML('beforeend','<span class="pl">▶</span>')}
+    else d.textContent=it.name;
+    d.insertAdjacentHTML('beforeend','<span class="ck">✓</span>');
+    let pt,long=false;
+    d.ontouchstart=d.onmousedown=()=>{long=false;pt=setTimeout(()=>{long=true;selMode=true;toggle(it.id)},450)};
+    d.ontouchend=d.onmouseup=d.ontouchmove=()=>clearTimeout(pt);
+    d.onclick=()=>{if(long)return;selMode?toggle(it.id):viewAt(i)};
+    g.appendChild(d);
+  });
+}
+function toggle(id){sel.has(id)?sel.delete(id):sel.add(id);if(!sel.size)selMode=false;render()}
+$('lock').onclick=()=>{if(selMode){selMode=false;sel.clear();render()}else lock()};
+async function removeIds(ids){
+  const p=[];for(const id of ids){const m=metas.get(id);if(!m)continue;p.push(id+'.m');for(let c=0;c<m.chunks;c++)p.push(`${id}.${c}`)}
+  if(p.length)await delPaths(p);ids.forEach(i=>{metas.delete(i);blobs.delete(i)});
+}
+$('addb').onclick=async()=>{
+  if(!selMode)return $('pick').click();
+  if(!confirm('Delete '+sel.size+' file(s) for everyone?'))return;
+  try{await removeIds([...sel])}catch(e){toast('Delete failed')}
+  sel.clear();selMode=false;await refresh(true);
+};
+async function mkThumb(f){
+  let u=null;
+  try{
+    let src,w,h;
+    if(f.type.startsWith('image/')){const bm=await createImageBitmap(f);src=bm;w=bm.width;h=bm.height}
+    else if(f.type.startsWith('video/')){
+      const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';u=URL.createObjectURL(f);v.src=u;
+      await new Promise((ok,no)=>{v.onloadeddata=ok;v.onerror=no;setTimeout(no,8000)});
+      v.currentTime=Math.min(1,(v.duration||1)/2);await new Promise(ok=>{v.onseeked=ok;setTimeout(ok,3000)});
+      src=v;w=v.videoWidth;h=v.videoHeight;
+    }else return null;
+    const s=Math.min(1,256/Math.max(w,h)),cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(w*s));cv.height=Math.max(1,Math.round(h*s));
+    cv.getContext('2d').drawImage(src,0,0,cv.width,cv.height);return cv.toDataURL('image/jpeg',.7);
+  }catch(e){return null}finally{if(u)URL.revokeObjectURL(u)}
+}
+const CH=16*1024*1024;
+async function addFile(f,i,n){
+  const id=Date.now().toString(36)+crypto.getRandomValues(new Uint32Array(1))[0].toString(36);
+  const cnt=Math.max(1,Math.ceil(f.size/CH));
+  for(let c=0;c<cnt;c++){
+    $('vt').textContent=`Uploading ${i+1}/${n} • ${Math.round(c/cnt*100)}%`;$('prog').style.width=((i+c/cnt)/n*100)+'%';
+    await put(`${id}.${c}`,await encBuf(await f.slice(c*CH,(c+1)*CH).arrayBuffer()));
+  }
+  const meta={name:f.name,type:f.type||'application/octet-stream',size:f.size,added:Date.now(),chunks:cnt,thumb:await mkThumb(f)};
+  await put(id+'.m',await encBuf(enc(JSON.stringify(meta))));
+}
+$('pick').onchange=async e=>{
+  const fs=[...e.target.files];e.target.value='';uploading=true;
+  try{for(let i=0;i<fs.length;i++)await addFile(fs[i],i,fs.length);toast('Done')}
+  catch(err){toast('Upload failed: '+err.message)}
+  uploading=false;$('prog').style.width='0';await refresh(true);
+};
+/* menu */
+$('menub').onclick=e=>{e.stopPropagation();$('menu').classList.toggle('hide')};
+document.addEventListener('click',()=>hid('menu'));
+$('mref').onclick=()=>refresh(true);
+$('msel').onclick=()=>{selMode=true;render()};
+/* viewer */
+async function getBlob(m,onp){
+  if(blobs.has(m.id))return blobs.get(m.id);
+  const parts=[];for(let c=0;c<m.chunks;c++){parts.push(await decBuf(await get(`${m.id}.${c}`)));onp&&onp((c+1)/m.chunks)}
+  const b=new Blob(parts,{type:m.type});blobs.set(m.id,b);return b;
+}
+async function viewAt(i){
+  if(i<0||i>=list.length)return;vi=i;const it=list[i];const mine=i+it.id;viewAt.k=mine;
+  show('view');$('vc').innerHTML='<div style="color:#ccc" id="ld">Loading…</div>';
+  $('vinfo').textContent=(i+1)+'/'+list.length+' • '+it.name+' • '+fmt(it.size);
+  try{
+    const b=await getBlob(it,p=>{const l=$('ld');if(l)l.textContent='Loading '+Math.round(p*100)+'%'});
+    if(viewAt.k!==mine)return;
+    if(vurl)URL.revokeObjectURL(vurl);vurl=URL.createObjectURL(b);
+    $('vc').innerHTML=it.type.startsWith('image/')?`<img src="${vurl}">`:it.type.startsWith('video/')?`<video src="${vurl}" controls autoplay playsinline></video>`:'<div style="color:#ccc;padding:20px;text-align:center"></div>';
+    if(!it.type.startsWith('image/')&&!it.type.startsWith('video/'))$('vc').firstChild.textContent=it.name;
+  }catch(e){if(viewAt.k===mine)$('vc').innerHTML='<div style="color:#f88">Could not open file</div>'}
+}
+$('vx').onclick=()=>{viewAt.k=null;hid('view');$('vc').innerHTML=''};
+$('vp').onclick=()=>viewAt(vi-1);$('vn').onclick=()=>viewAt(vi+1);
+$('vd').onclick=async()=>{const it=list[vi];try{const b=await getBlob(it);const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=it.name;a.click()}catch(e){toast('Save failed')}};
+$('vdel').onclick=async()=>{if(!confirm('Delete this file for everyone?'))return;try{await removeIds([list[vi].id])}catch(e){return toast('Delete failed')}viewAt.k=null;hid('view');$('vc').innerHTML='';refresh(true)};
+let sx=0;$('vc').ontouchstart=e=>sx=e.touches[0].clientX;
+$('vc').ontouchend=e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>70)viewAt(vi+(dx<0?1:-1))};
+</script>
+</body></html>

@@ -1,0 +1,9 @@
+<!DOCTYPE html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hash</title>
+<body style="font-family:sans-serif;padding:20px;background:#111;color:#eee">
+<h3>Password hash banao</h3>
+<input id="p" placeholder="apna password" style="width:100%;padding:12px;font-size:16px"><br><br>
+<button onclick="go()" style="padding:12px 20px;font-size:16px">Hash banao</button>
+<p>Neeche wala text config.json mein <b>password_hash</b> ki jagah paste karo:</p>
+<textarea id="o" readonly style="width:100%;height:80px;font-size:14px"></textarea>
+<script>async function go(){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(document.getElementById('p').value));document.getElementById('o').value=[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}</script>
+</body>
